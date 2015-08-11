@@ -99,7 +99,6 @@ std::string CriadorArquivos::gera_les(GeneticParams genetic_params) {
 
 }
 
-
 std::string CriadorArquivos::gera_le_funcs(GeneticParams genetic_params) {
 	std::string result;
 	std::vector<std::string> funcs = { "and", "or", "xor", "not", "nand",
@@ -129,7 +128,7 @@ std::string CriadorArquivos::gera_le_funcs(GeneticParams genetic_params) {
 			const int current_min = current_max - (bits_pinos - 1);
 			inputs += std::string("all_inputs[conf_ins[") + to_string(current_max)
 								+ std::string(":") + to_string(current_min) + "]]";
-			if (filtered_funcs[i] == "not") {
+			if (filtered_funcs[i] == "not" || filtered_funcs[i] == "buf") {
 				break;
 			}
 			if (j != 1) {

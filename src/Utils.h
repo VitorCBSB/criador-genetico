@@ -11,7 +11,9 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-
+#include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
 
 template<typename T>
 std::string to_string(const T& n) {
