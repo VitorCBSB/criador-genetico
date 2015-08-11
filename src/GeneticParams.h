@@ -14,13 +14,13 @@ class GeneticParams {
 public:
 	unsigned int num_in;
 	unsigned int num_out;
-	std::array<8, bool> funcs;
+	std::array<bool, 8> funcs;
 	unsigned int le_num_in;
 	unsigned int r;
 	unsigned int c;
 
 	GeneticParams(unsigned int num_in, unsigned int num_out,
-			std::vector<bool> funcs, unsigned int le_num_in, unsigned int r,
+			std::array<bool, 8> funcs, unsigned int le_num_in, unsigned int r,
 			unsigned int c) :
 			num_in(num_in), num_out(num_out), funcs(funcs), le_num_in(
 					le_num_in), r(r), c(c) {
