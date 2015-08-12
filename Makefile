@@ -1,6 +1,6 @@
 # Declaration of variables
 CC = g++
-CC_FLAGS = -w -std=c++11 -O3
+CC_FLAGS = -w -std=c++11
 
 # File names
 EXEC = criador-genetico
