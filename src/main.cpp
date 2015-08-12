@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
 
 	CriadorArquivos::cria_arquivo_genetico(genetic_params, "genetico.v");
 	CriadorArquivos::cria_arquivo_logic_e(genetic_params, "logic_e.v");
+	CriadorArquivos::cria_arquivo_main(genetic_params, "main.v");
 
 	return 0;
 }

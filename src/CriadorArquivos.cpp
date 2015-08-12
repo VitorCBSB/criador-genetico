@@ -18,13 +18,13 @@ void CriadorArquivos::cria_arquivo_genetico(GeneticParams genetic_params, const 
 			+ ceil(log2(total_pinos)) * genetic_params.le_num_in;
 
 	replace(arquivo_modelo, "#tam_le", to_string(tam_le - 1));
-	replace(arquivo_modelo, "#r_x_c",
-			to_string(genetic_params.r * genetic_params.c - 1));
+	replace(arquivo_modelo, "#r", to_string(genetic_params.r - 1));
+	replace(arquivo_modelo, "#c", to_string(genetic_params.c - 1));
 	replace(arquivo_modelo, "#num_in", to_string(genetic_params.num_in - 1));
 	replace(arquivo_modelo, "#num_out", to_string(genetic_params.num_out - 1));
 	replace(arquivo_modelo, "#num_out", to_string(genetic_params.num_out - 1));
-	replace(arquivo_modelo, "#r_x_c",
-			to_string(genetic_params.r * genetic_params.c - 1));
+	replace(arquivo_modelo, "#r", to_string(genetic_params.r - 1));
+	replace(arquivo_modelo, "#c", to_string(genetic_params.c - 1));
 	replace(arquivo_modelo, "#bits_pinos", to_string(bits_pinos - 1));
 	replace(arquivo_modelo, "#num_pinos", to_string(total_pinos - 1));
 	replace(arquivo_modelo, "#all_inputs_for_out", gera_string_saida(genetic_params));
@@ -67,10 +67,10 @@ std::string CriadorArquivos::gera_string_saida(GeneticParams genetic_params) {
 std::string CriadorArquivos::gera_les(GeneticParams genetic_params) {
 	std::string resultado;
 	const std::string base = std::string("logic_e le#r#c(\n")
-			+ std::string("\t.conf_func(conf_les[#n][#bits_top:#bits_next]),\n")
-			+ std::string("\t.conf_ins(conf_les[#n][#bits_rest:0]),\n")
+			+ std::string("\t.conf_func(conf_les[#r][#c][#bits_top:#bits_next]),\n")
+			+ std::string("\t.conf_ins(conf_les[#r][#c][#bits_rest:0]),\n")
 			+ std::string("\t.all_inputs(all_inputs),\n")
-			+ std::string("\t.out(le_out[#n])\n") + ");\n\n";
+			+ std::string("\t.out(le_out[#r][#c])\n") + ");\n\n";
 
 	const int total_pinos = genetic_params.r * genetic_params.c
 			+ genetic_params.num_in;
@@ -80,13 +80,15 @@ std::string CriadorArquivos::gera_les(GeneticParams genetic_params) {
 
 	for (unsigned int j = 0; j < genetic_params.c; j++) {
 		for (unsigned int i = 0; i < genetic_params.r; i++) {
-			const int current = j * genetic_params.r + i;
 			auto current_le = base;
 			replace(current_le, "#r", to_string(i));
 			replace(current_le, "#c", to_string(j));
-			replace(current_le, "#n", to_string(current));
-			replace(current_le, "#n", to_string(current));
-			replace(current_le, "#n", to_string(current));
+			replace(current_le, "#r", to_string(i));
+			replace(current_le, "#c", to_string(j));
+			replace(current_le, "#r", to_string(i));
+			replace(current_le, "#c", to_string(j));
+			replace(current_le, "#r", to_string(i));
+			replace(current_le, "#c", to_string(j));
 			replace(current_le, "#bits_top", to_string(bits_top - 1));
 			replace(current_le, "#bits_next", to_string(bits_top - bits_func));
 			replace(current_le, "#bits_rest",
@@ -168,6 +170,73 @@ std::string CriadorArquivos::gera_le_input_assignments(GeneticParams genetic_par
 		replace(current_modelo, "#bits_pinos_1", to_string(bits_pinos - 1));
 
 		resultado += current_modelo;
+	}
+
+	return resultado;
+}
+
+void CriadorArquivos::cria_arquivo_main(GeneticParams genetic_params, const std::string& nome_arquivo) {
+	auto arquivo_modelo = le_conteudo_arquivo("main_modelo");
+	std::ofstream arquivo_resultado(nome_arquivo);
+
+	const int bits_func = ceil(log2(genetic_params.num_funcs()));
+	const int num_les = genetic_params.r * genetic_params.c;
+	const int bits_pinos = ceil(log2(num_les + genetic_params.num_in));
+	const int bits_les = genetic_params.le_num_in * bits_pinos + bits_func;
+	const int bits_total = num_les * bits_les + (genetic_params.num_out * bits_pinos);
+
+	replace(arquivo_modelo, "#bits_total", to_string(bits_total - 1));
+	replace(arquivo_modelo, "#r", to_string(genetic_params.r - 1));
+	replace(arquivo_modelo, "#c", to_string(genetic_params.c - 1));
+	replace(arquivo_modelo, "#bits_les_1", to_string(bits_les - 1));
+	replace(arquivo_modelo, "#num_outputs_1", to_string(genetic_params.num_out - 1));
+	replace(arquivo_modelo, "#bits_pinos_1", to_string(bits_pinos - 1));
+	replace(arquivo_modelo, "#num_inputs_1", to_string(genetic_params.num_in - 1));
+	replace(arquivo_modelo, "#num_outputs_1", to_string(genetic_params.num_out - 1));
+	replace(arquivo_modelo, "#crom_translate_to_descrs", gera_associacoes_cromossomo(genetic_params));
+
+	arquivo_resultado << arquivo_modelo;
+}
+
+std::string CriadorArquivos::gera_associacoes_cromossomo(GeneticParams genetic_params) {
+	std::string resultado;
+	const std::string base_les = "\tassign descricao_les[#cur_r][#cur_c] = cromossomo[#cur_le_top:#cur_le_bot]\n";
+	const std::string base_outs = "\tassign descricao_outs[#cur_out] = cromossomo[#cur_out_top:#cur_out_bot]\n";
+
+	const int num_les = genetic_params.r * genetic_params.c;
+	const int bits_pinos = ceil(log2(num_les + genetic_params.num_in));
+	const int bits_func = ceil(log2(genetic_params.num_funcs()));
+	const int bits_le = genetic_params.le_num_in * bits_pinos + bits_func;
+	const int bits_les_total = bits_le * num_les;
+
+	for (int j = 0; j < genetic_params.c; j++) {
+		for (int i = 0; i < genetic_params.r; i++) {
+			const int current = j * genetic_params.r + i;
+			const int current_bot = current * bits_le;
+			const int current_top = ((current + 1) * bits_le) - 1;
+			auto assign_atual = base_les;
+
+			replace(assign_atual, "#cur_r", to_string(i));
+			replace(assign_atual, "#cur_c", to_string(j));
+			replace(assign_atual, "#cur_le_top", to_string(current_top));
+			replace(assign_atual, "#cur_le_bot", to_string(current_bot));
+
+			resultado += assign_atual;
+		}
+	}
+
+	resultado += "\n";
+
+	for (int i = 0; i < genetic_params.num_out; i++) {
+		auto assign_atual = base_outs;
+		const int current_bot = bits_les_total + (i * bits_pinos);
+		const int current_top = bits_les_total + (((i + 1) * bits_pinos) - 1);
+
+		replace(assign_atual, "#cur_out", to_string(i));
+		replace(assign_atual, "#cur_out_top", to_string(current_top));
+		replace(assign_atual, "#cur_out_bot", to_string(current_bot));
+
+		resultado += assign_atual;
 	}
 
 	return resultado;

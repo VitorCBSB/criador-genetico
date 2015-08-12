@@ -1,0 +1,19 @@
+module main();
+
+	integer i;
+	reg [#bits_total:0] cromossomo;
+	wire [#r:0][#c:0][#bits_les_1:0] descricao_les;
+	reg [#num_outputs_1:0][#bits_pinos_1:0] descricao_outs;
+	reg [#num_inputs_1:0] in;
+	wire [#num_outputs_1:0] out;
+
+#crom_translate_to_descrs
+
+genetico genetico (
+	.conf_les(descricao_les),
+	.conf_outs(descricao_outs),
+	.in(in),
+	.out(out)
+);
+
+endmodule
