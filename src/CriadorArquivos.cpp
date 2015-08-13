@@ -16,6 +16,7 @@ void CriadorArquivos::cria_arquivo_genetico(GeneticParams genetic_params, const 
 	const int bits_pinos = ceil(log2(total_pinos));
 	const int tam_le = ceil(log2(genetic_params.num_funcs()))
 			+ ceil(log2(total_pinos)) * genetic_params.le_num_in;
+	const int num_les = genetic_params.r * genetic_params.c;
 
 	replace(arquivo_modelo, "#tam_le", to_string(tam_le - 1));
 	replace(arquivo_modelo, "#r", to_string(genetic_params.r - 1));
@@ -23,8 +24,7 @@ void CriadorArquivos::cria_arquivo_genetico(GeneticParams genetic_params, const 
 	replace(arquivo_modelo, "#num_in", to_string(genetic_params.num_in - 1));
 	replace(arquivo_modelo, "#num_out", to_string(genetic_params.num_out - 1));
 	replace(arquivo_modelo, "#num_out", to_string(genetic_params.num_out - 1));
-	replace(arquivo_modelo, "#r", to_string(genetic_params.r - 1));
-	replace(arquivo_modelo, "#c", to_string(genetic_params.c - 1));
+	replace(arquivo_modelo, "#num_les_1", to_string(num_les - 1));
 	replace(arquivo_modelo, "#bits_pinos", to_string(bits_pinos - 1));
 	replace(arquivo_modelo, "#num_pinos", to_string(total_pinos - 1));
 	replace(arquivo_modelo, "#all_inputs_for_out", gera_string_saida(genetic_params));
@@ -70,7 +70,7 @@ std::string CriadorArquivos::gera_les(GeneticParams genetic_params) {
 			+ std::string("\t.conf_func(conf_les[#r][#c][#bits_top:#bits_next]),\n")
 			+ std::string("\t.conf_ins(conf_les[#r][#c][#bits_rest:0]),\n")
 			+ std::string("\t.all_inputs(all_inputs),\n")
-			+ std::string("\t.out(le_out[#r][#c])\n") + ");\n\n";
+			+ std::string("\t.out(le_out[#n])\n") + ");\n\n";
 
 	const int total_pinos = genetic_params.r * genetic_params.c
 			+ genetic_params.num_in;
@@ -80,6 +80,7 @@ std::string CriadorArquivos::gera_les(GeneticParams genetic_params) {
 
 	for (unsigned int j = 0; j < genetic_params.c; j++) {
 		for (unsigned int i = 0; i < genetic_params.r; i++) {
+			const int current = j * genetic_params.r + i;
 			auto current_le = base;
 			replace(current_le, "#r", to_string(i));
 			replace(current_le, "#c", to_string(j));
@@ -87,8 +88,7 @@ std::string CriadorArquivos::gera_les(GeneticParams genetic_params) {
 			replace(current_le, "#c", to_string(j));
 			replace(current_le, "#r", to_string(i));
 			replace(current_le, "#c", to_string(j));
-			replace(current_le, "#r", to_string(i));
-			replace(current_le, "#c", to_string(j));
+			replace(current_le, "#n", to_string(current));
 			replace(current_le, "#bits_top", to_string(bits_top - 1));
 			replace(current_le, "#bits_next", to_string(bits_top - bits_func));
 			replace(current_le, "#bits_rest",
