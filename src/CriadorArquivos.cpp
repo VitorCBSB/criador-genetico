@@ -200,8 +200,8 @@ void CriadorArquivos::cria_arquivo_main(GeneticParams genetic_params, const std:
 
 std::string CriadorArquivos::gera_associacoes_cromossomo(GeneticParams genetic_params) {
 	std::string resultado;
-	const std::string base_les = "\tassign descricao_les[#cur_r][#cur_c] = cromossomo[#cur_le_top:#cur_le_bot]\n";
-	const std::string base_outs = "\tassign descricao_outs[#cur_out] = cromossomo[#cur_out_top:#cur_out_bot]\n";
+	const std::string base_les = "\tassign descricao_les[#cur_r][#cur_c] = cromossomo[#cur_le_top:#cur_le_bot];\n";
+	const std::string base_outs = "\tassign descricao_outs[#cur_out] = cromossomo[#cur_out_top:#cur_out_bot];\n";
 
 	const int num_les = genetic_params.r * genetic_params.c;
 	const int bits_pinos = ceil(log2(num_les + genetic_params.num_in));
