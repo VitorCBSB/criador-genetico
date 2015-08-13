@@ -175,8 +175,8 @@ std::string CriadorArquivos::gera_le_input_assignments(GeneticParams genetic_par
 	return resultado;
 }
 
-void CriadorArquivos::cria_arquivo_main(GeneticParams genetic_params, const std::string& nome_arquivo) {
-	auto arquivo_modelo = le_conteudo_arquivo("main_modelo");
+void CriadorArquivos::cria_arquivo_fenotipo(GeneticParams genetic_params, const std::string& nome_arquivo) {
+	auto arquivo_modelo = le_conteudo_arquivo("fenotipo_modelo");
 	std::ofstream arquivo_resultado(nome_arquivo);
 
 	const int bits_func = ceil(log2(genetic_params.num_funcs()));
