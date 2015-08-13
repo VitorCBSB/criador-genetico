@@ -9,6 +9,7 @@
 #define GENETICPARAMS_H_
 
 #include <algorithm>
+#include <array>
 
 class GeneticParams {
 public:
