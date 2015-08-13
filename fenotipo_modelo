@@ -1,6 +1,6 @@
 module fenotipo(
-	input reg [#bits_total:0] cromossomo,
-	input reg [#num_inputs_1:0] in,
+	input [#bits_total:0] cromossomo,
+	input [#num_inputs_1:0] in,
 	output wire [#num_outputs_1:0] out
 );
 
